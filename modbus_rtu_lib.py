@@ -113,7 +113,7 @@ class Modbus:
         return response[3:-2]
 
     
-    def read_do_integers(self, device_addr:int, start_reg_addr:int, ints_amount:int) -> list[int]:
+    def read_coils(self, device_addr:int, start_reg_addr:int, ints_amount:int) -> list[int]:
         command = b'\x01'
 
         byte_data = self._return_bytes(command, device_addr, start_reg_addr, ints_amount)
@@ -122,7 +122,7 @@ class Modbus:
         return data
 
 
-    def read_di_integers(self, device_addr:int, start_reg_addr:int, ints_amount:int) -> list[int]:
+    def read_disc_inputs(self, device_addr:int, start_reg_addr:int, ints_amount:int) -> list[int]:
         command = b'\x02'
 
         byte_data = self._return_bytes(command, device_addr, start_reg_addr, ints_amount)
@@ -131,7 +131,7 @@ class Modbus:
         return data
 
 
-    def read_ao_integers(self, device_addr:int, start_reg_addr:int, ints_amount:int, int_format='short', is_signed=False) -> list[int]:
+    def read_hold_regs_integers(self, device_addr:int, start_reg_addr:int, ints_amount:int, int_format='short', is_signed=False) -> list[int]:
         command = b'\x03'
 
         if int_format == 'short':
@@ -158,7 +158,7 @@ class Modbus:
         return data
 
 
-    def read_ao_floats(self, device_addr:int, start_reg_addr:int, floats_amount:int, float_precision='float') -> list[float]:
+    def read_hold_regs_floats(self, device_addr:int, start_reg_addr:int, floats_amount:int, float_precision='float') -> list[float]:
         command = b'\x03'
 
         if float_precision == 'float':
@@ -176,3 +176,37 @@ class Modbus:
         data = [i for i in struct.unpack('>'+float_format_char*floats_amount, byte_data)]
 
         return data
+
+
+    def read_hold_regs_ascii(self, device_addr:int, start_reg_addr:int, symbols_amount:int, safe_mode=True) -> list[str]:
+        command = b'\x03'
+
+        byte_data = self._return_bytes(command, device_addr, start_reg_addr, symbols_amount*2)
+        data = [i for i in byte_data.decode('ASCII')]
+
+        if safe_mode:
+            for symbol in data:
+                if type(symbol) == bytes:
+                    raise ValueError()
+
+        return data
+
+
+    def read_input_regs(self):
+        pass
+
+
+    def write_single_coil(self):
+        pass
+
+
+    def write_single_reg(self):
+        pass
+
+
+    def write_multi_coils(self):
+        pass
+
+
+    def write_multi_regs(self):
+        pass
